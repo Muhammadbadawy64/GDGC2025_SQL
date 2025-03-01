@@ -1,0 +1,94 @@
+CREATE DATABASE Online_Shopping;
+USE Online_Shopping;
+
+CREATE TABLE Customer(
+CustID INT IDENTITY PRIMARY KEY NOT NULL,
+Name NVARCHAR(100) NOT NULL,
+PhoneNumber NVARCHAR(20) NOT NULL ,
+Address NVARCHAR(50) NOT NULL,
+Email NVARCHAR(100) UNIQUE NOT NULL
+)
+SELECT * FROM Customer;
+
+
+CREATE TABLE Orderss(
+orderID INT IDENTITY PRIMARY KEY NOT NULL,
+orderDate DATETIME DEFAULT GETUTCDATE(),
+totalAmount DECIMAL(7,2) NOT NULL,
+CustID INT NOT NULL,
+status NVARCHAR(50) CHECK (status IN ('pending', 'shipped','Delivered', 'cancelled'))
+ DEFAULT 'pending',
+FOREIGN KEY (CustID) REFERENCES Customers(CustID)
+)
+SELECT * FROM Orderss;
+
+
+CREATE TABLE OrderDetail(
+ordersDetailID INT IDENTITY PRIMARY KEY NOT NULL,
+orderID INT NOT NULL, 
+productID INT NOT NULL, 
+quantity INT NOT NULL,
+price DECIMAL(10,2) NOT NULL
+)
+SELECT * FROM OrdersDetail;
+
+
+CREATE TABLE Products(
+productID INT IDENTITY PRIMARY KEY NOT NULL,
+name NVARCHAR(100) UNIQUE NOT NULL,
+category NVARCHAR(50)  NOT NULL,
+Description NVARCHAR(200) NOT NULL,
+price DECIMAL(10,2) NOT NULL
+)
+SELECT * FROM Products;
+ALTER TABLE Products
+ADD rating DECIMAL(3,2) DEFAULT 0.00;
+
+SELECT COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Products';
+
+
+CREATE TABLE Suppliers(
+SupplierID INT IDENTITY PRIMARY KEY NOT NULL,
+contactInfo NVARCHAR(100) NOT NULL,
+name NVARCHAR(100) NOT NULL
+)
+SELECT * FROM Suppliers;
+
+
+CREATE TABLE Order_Product(
+orderID INT NOT NULL,
+productID INT NOT NULL,
+PRIMARY KEY (orderID, productID),
+FOREIGN KEY (orderID) REFERENCES Orders(orderID),
+FOREIGN KEY (productID) REFERENCES Products(productID)
+)
+SELECT * FROM Order_Product;
+
+CREATE TABLE Supplier_Product(
+SupplierID INT NOT NULL,
+productID INT NOT NULL,
+PRIMARY KEY (SupplierID, productID),
+FOREIGN KEY (SupplierID) REFERENCES Supplier(SupplierID),
+FOREIGN KEY (productID) REFERENCES Products(productID)
+)
+SELECT * FROM Supplier_Product;
+
+ALTER TABLE Products
+ADD CONSTRAINT DF_Products_Category DEFAULT 'new' FOR Category;
+
+
+ALTER TABLE Products
+DROP CONSTRAINT [DF__Products__rating__39AD8A7F];
+ALTER TABLE Products
+DROP COLUMN rating;
+SELECT * FROM Products;
+DROP DATABASE social_media;
+
+UPDATE Orders
+SET orderDate = GETUTCDATE()
+WHERE orderID > 0;
+
+DELETE FROM Products
+WHERE name IS NOT NULL AND name <> 'Null';
